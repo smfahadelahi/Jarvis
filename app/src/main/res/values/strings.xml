@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">J.A.R.V.I.S.</string>
+
+    <string name="channel_alarms">Alarms &amp; Timers</string>
+    <string name="channel_alarms_desc">Alarms, timers and reminders set through Jarvis.</string>
+    <string name="channel_service">Background Service</string>
+    <string name="channel_service_desc">Persistent notification for the wake-word listener.</string>
+    <string name="channel_general">General</string>
+
+    <string name="wake_service_notification_title">Jarvis is listening</string>
+    <string name="wake_service_notification_text">Say “Jarvis” to get my attention, sir.</string>
+</resources>
