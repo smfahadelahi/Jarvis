@@ -66,6 +66,3 @@ val HudStatusStyle = TextStyle(
     fontSize = 11.sp,
     letterSpacing = 1.4.sp
 )
-
-/** Suppress unused warning helper (system theme kept for future theming). */
-private val unused = isSystemInDarkTheme
