@@ -124,7 +124,7 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
 
     fun reloadModel() {
         viewModelScope.launch {
-            val path = settings.modelPath.firstOrNull() ?: return@launch
+            val path = settings.modelPath.first()
             if (path.isNotBlank()) container.llmEngine.load(path)
         }
     }

@@ -207,7 +207,7 @@ class HudViewModel(
         }
         // Restore saved mode preference.
         viewModelScope.launch {
-            val saved = kotlinx.coroutines.flow.first(settings.modeName)
+            val saved = settings.modeName.first()
             val mode = AgentMode.fromName(saved)
             orchestrator.setMode(mode)
             _uiState.update { it.copy(mode = mode) }

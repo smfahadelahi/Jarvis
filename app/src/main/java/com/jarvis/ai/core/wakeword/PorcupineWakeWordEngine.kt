@@ -1,6 +1,6 @@
 package com.jarvis.ai.core.wakeword
 
-import ai.picovoice.porcupine.BuiltInKeyword
+import ai.picovoice.porcupine.Porcupine
 import ai.picovoice.porcupine.PorcupineException
 import ai.picovoice.porcupine.PorcupineManager
 import ai.picovoice.porcupine.PorcupineManagerCallback
@@ -41,10 +41,9 @@ class PorcupineWakeWordEngine(
         try {
             manager = PorcupineManager.Builder()
                 .setAccessKey(accessKey)
-                .setKeyword(BuiltInKeyword.JARVIS)
+                .setKeyword(Porcupine.BuiltInKeyword.JARVIS)
                 .setSensitivity(sensitivity)
-                .setObject(PorcupineManagerCallback { _detections.tryEmit(Unit) })
-                .build(context)
+                .build(context, PorcupineManagerCallback { _detections.tryEmit(Unit) })
             manager?.start()
             Log.i(TAG, "Wake word engine started (keyword=jarvis)")
         } catch (e: PorcupineException) {

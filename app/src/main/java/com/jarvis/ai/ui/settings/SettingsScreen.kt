@@ -195,15 +195,8 @@ fun SettingsScreen(
             placeholder = { Text("Free key at console.picovoice.ai", color = JarvisTextDim.copy(alpha = 0.5f)) },
             singleLine = true,
             trailingIcon = {
-                if (keyField != state.settings.picovoiceKey) {
-                    Text(
-                        "SAVE",
-                        style = HudStatusStyle,
-                        color = JarvisSecondary,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .clickableText { viewModel.setPicovoiceKey(keyField) }
-                    )
+                SaveLabel(visible = keyField != state.settings.picovoiceKey) {
+                    viewModel.setPicovoiceKey(keyField)
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
@@ -229,15 +222,8 @@ fun SettingsScreen(
             label = { Text("Default city (weather & briefing)", color = JarvisTextDim) },
             singleLine = true,
             trailingIcon = {
-                if (cityField != state.settings.city) {
-                    Text(
-                        "SAVE",
-                        style = HudStatusStyle,
-                        color = JarvisSecondary,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .clickableText { viewModel.setCity(cityField) }
-                    )
+                SaveLabel(visible = cityField != state.settings.city) {
+                    viewModel.setCity(cityField)
                 }
             },
             colors = OutlinedTextFieldDefaults.colors(
@@ -277,24 +263,20 @@ private fun exactAlarmState(context: Context): String {
     else "Exact alarms NOT granted — alarms may drift a few minutes."
 }
 
-/** Inline clickable SAVE label. */
-private fun Modifier.clickableText(onClick: () -> Unit): Modifier =
-    this.then(
-        Modifier.pointerInputCompat(onClick)
+/** Inline clickable SAVE label shown only when a field has unsaved edits. */
+@Composable
+private fun SaveLabel(visible: Boolean, onClick: () -> Unit) {
+    if (!visible) return
+    Text(
+        text = "SAVE",
+        style = HudStatusStyle,
+        color = JarvisSecondary,
+        modifier = Modifier
+            .clip(RoundedCornerShape(6.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     )
-
-private fun Modifier.pointerInputCompat(onClick: () -> Unit): Modifier =
-    this.then(
-        androidx.compose.ui.Modifier.let { base ->
-            base.then(
-                androidx.compose.foundation.clickable(
-                    interactionSource = androidx.compose.foundation.interaction.MutableInteractionSource(),
-                    indication = null,
-                    onClick = onClick
-                ).let { clickableModifier -> base.then(clickableModifier).let { this.then(clickableModifier) } }
-            )
-        }
-    )
+}
 
 @Composable
 private fun SettingsSection(title: String) {

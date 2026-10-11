@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.jarvis.ai.core.AgentState
 import com.jarvis.ai.core.AgentMode
 import com.jarvis.ai.ui.theme.HudMono
