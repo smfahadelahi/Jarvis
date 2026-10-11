@@ -50,9 +50,11 @@ object JsonActionParser {
         }
 
         // Fallback: sibling scalar keys act as parameters ({"tool":"x","hour":7}).
+        // Only the key consumed as the tool name is excluded — "action" may
+        // legitimately be a parameter (e.g. set_volume's action param).
         if (params.isEmpty()) {
             obj.keys().forEach { key ->
-                if (TOOL_KEYS.contains(key)) return@forEach
+                if (key == toolKey) return@forEach
                 val value = obj.opt(key)
                 if (value is JSONObject || value is JSONArray) return@forEach
                 params[key] = flatten(value)
