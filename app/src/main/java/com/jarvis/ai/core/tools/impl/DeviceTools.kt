@@ -199,7 +199,7 @@ internal class OpenSettingsPanelTool(private val context: Context) : Tool {
             ?: return ToolResult(false, "Which settings panel, sir?")
         val intent = when (target) {
             "wifi", "wi-fi", "wireless" -> android.content.Intent(Settings.Panel.ACTION_WIFI)
-            "bluetooth" -> android.content.Intent(Settings.Panel.ACTION_BLUETOOTH)
+            "bluetooth" -> android.content.Intent(Settings.ACTION_BLUETOOTH_SETTINGS)
             "internet", "connectivity", "data" -> android.content.Intent(Settings.Panel.ACTION_INTERNET_CONNECTIVITY)
             "volume", "sound" -> android.content.Intent(Settings.Panel.ACTION_VOLUME)
             "display", "screen" -> android.content.Intent(Settings.ACTION_DISPLAY_SETTINGS)
@@ -218,7 +218,7 @@ internal class OpenSettingsPanelTool(private val context: Context) : Tool {
 internal class BatteryStatusTool(private val context: Context) : Tool {
     override val name = "battery_status"
     override val description = "Report battery level, charging state, and temperature."
-    override val parameters = emptyList()
+    override val parameters = emptyList<ParamSpec>()
 
     override suspend fun execute(params: Map<String, String>): ToolResult {
         val intent = context.registerReceiver(null, android.content.IntentFilter(android.content.Intent.ACTION_BATTERY_CHANGED))

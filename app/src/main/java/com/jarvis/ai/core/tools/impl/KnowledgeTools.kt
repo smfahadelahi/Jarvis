@@ -40,7 +40,7 @@ object KnowledgeTools {
 internal class CurrentTimeTool : Tool {
     override val name = "current_time"
     override val description = "Report the current local date and time."
-    override val parameters = emptyList()
+    override val parameters = emptyList<ParamSpec>()
 
     override suspend fun execute(params: Map<String, String>): ToolResult {
         val now = LocalDateTime.now()
@@ -242,7 +242,7 @@ internal class MorningBriefingTool(
 ) : Tool {
     override val name = "morning_briefing"
     override val description = "Assemble an executive briefing: time, battery, calendar, weather."
-    override val parameters = emptyList()
+    override val parameters = emptyList<ParamSpec>()
 
     override suspend fun execute(params: Map<String, String>): ToolResult {
         val lines = mutableListOf<String>()

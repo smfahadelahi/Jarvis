@@ -173,7 +173,7 @@ internal class SetReminderTool(
 internal class ListAlarmsTool(private val container: AppContainer) : Tool {
     override val name = "list_alarms"
     override val description = "List currently scheduled alarms, timers, and reminders."
-    override val parameters = emptyList()
+    override val parameters = emptyList<ParamSpec>()
 
     override suspend fun execute(params: Map<String, String>): ToolResult {
         val entries = container.alarmScheduler.listPending()

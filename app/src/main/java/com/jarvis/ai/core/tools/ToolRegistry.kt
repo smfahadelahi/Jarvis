@@ -18,7 +18,7 @@ class ToolRegistry {
 
     fun all(): List<Tool> = tools.values.toList()
 
-    fun execute(name: String, params: Map<String, String>): ToolResult {
+    suspend fun execute(name: String, params: Map<String, String>): ToolResult {
         val tool = tools[name] ?: throw UnknownToolException(name)
         return tool.execute(params)
     }
