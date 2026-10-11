@@ -12,6 +12,7 @@ import com.jarvis.ai.core.tools.ToolRegistry
 import com.jarvis.ai.core.tools.UnknownToolException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import java.time.LocalDateTime
 
 /**
  * The agent loop.
@@ -47,7 +48,7 @@ class AgentOrchestrator(
     }
 
     fun currentState(): AgentState = when {
-        busy -> AgentState.THINKING
+        busy.get() -> AgentState.THINKING
         tts.speaking.value -> AgentState.SPEAKING
         else -> AgentState.IDLE
     }

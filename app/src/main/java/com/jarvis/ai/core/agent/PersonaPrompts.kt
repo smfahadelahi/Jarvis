@@ -1,5 +1,6 @@
 package com.jarvis.ai.core.agent
 
+import com.jarvis.ai.core.AgentMode
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale

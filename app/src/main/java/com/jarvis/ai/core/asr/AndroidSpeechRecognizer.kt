@@ -43,7 +43,7 @@ class AndroidSpeechRecognizer(private val context: Context) {
 
     fun start(languageTag: String = "en-US") {
         if (!isAvailable) {
-            _events.tryEmit(AsrEvent.Failed(ERROR_CLIENT, "Speech recognition unavailable on this device."))
+            _events.tryEmit(AsrEvent.Failed(SpeechRecognizer.ERROR_CLIENT, "Speech recognition unavailable on this device."))
             return
         }
         mainHandler.post {
