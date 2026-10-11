@@ -49,12 +49,11 @@ jobs:
       - name: Surface test failures as annotations
         if: failure()
         run: |
-          {
-            echo "## Test/compile errors"
-            echo '```'
-            grep -E "^e: |error: |FAILED" test.log | head -40 || echo "(no compiler lines found)"
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-          grep -E "^e: " test.log | head -50 | while IFS= read -r line; do
+          # Failed test names from JUnit XML reports
+          grep -h "<failure" app/build/test-results/testDebugUnitTest/*.xml 2>/dev/null | head -15 | while IFS= read -r line; do
+            echo "::error::${line:0:300}"
+          done
+          # Console tail — captures whatever text the failure used
+          tail -40 test.log | while IFS= read -r line; do
             echo "::error::$line"
           done
