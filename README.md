@@ -133,7 +133,11 @@ app/src/test/                     # JUnit: parser, time, arithmetic, fast-path s
 ./gradlew :app:testDebugUnitTest
 ```
 
-Covers the pure-Kotlin core: `JsonActionParser` (adversarial LLM output), `TimeParser` (meridiem edges, word times, durations), `ArithmeticEvaluator` (precedence, right-associative exponent, malformed input), `CommandFastPath` (intent routing and negative cases).
+Covers the pure-Kotlin core: `JsonActionParser` (adversarial LLM output), `TimeParser` (meridiem edges, word times, durations), `ArithmeticEvaluator` (precedence, right-associative exponent, malformed input), `CommandFastPath` (intent routing and negative cases), `PersonaPrompts` (manifest/mode/time injection), and `Repertoire` (pool bounds, determinism).
+
+## Continuous integration
+
+`.github/workflows/android-ci.yml` runs on every push and PR: JDK 17 + Gradle cache → `assembleDebug` (full compile verification, including resources and manifest merge) → `testDebugUnitTest`. Failed runs upload the HTML test reports as artifacts.
 
 ## Roadmap
 

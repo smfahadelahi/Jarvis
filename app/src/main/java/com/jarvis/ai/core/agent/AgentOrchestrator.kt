@@ -59,19 +59,18 @@ class AgentOrchestrator(
     suspend fun handleUserInput(rawInput: String) {
         val input = rawInput.trim()
         if (input.isEmpty()) return
-        if (busy) {
-            emit(AgentEvent.Failure("One moment, sir — still attending to your previous request."))
+        if (!busy.compareAndSet(false, true)) {
+            emit(AgentEvent.Failure(Repertoire.from(Repertoire.busy)))
             return
         }
-        busy = true
         try {
             process(input)
         } catch (t: Throwable) {
             Log.e(TAG, "Turn failed", t)
             emit(AgentEvent.StateChanged(AgentState.ERROR))
-            finishTurn("A system fault interrupted me mid-thought, sir. Retry at your leisure.")
+            finishTurn(Repertoire.from(Repertoire.faults))
         } finally {
-            busy = false
+            busy.set(false)
         }
     }
 
@@ -174,13 +173,18 @@ class AgentOrchestrator(
 
     private suspend fun llmTurn(input: String) {
         // Memory already contains this user turn (added in process()).
+        // The trailing "JARVIS:" cue is deliberate: completion-style engines
+        // imitate the demonstrated dialogue format far more reliably when the
+        // next speaker slot is left visibly open.
         val prompt = buildString {
-            appendLine(PersonaPrompts.system(mode, tools.manifest()))
+            appendLine(PersonaPrompts.system(mode, tools.manifest(), LocalDateTime.now()))
             if (memory.size > 0) {
                 appendLine()
                 appendLine("Conversation so far:")
                 appendLine(memory.render())
             }
+            appendLine()
+            append("JARVIS:")
         }
 
         var buffer = ""
@@ -227,9 +231,11 @@ class AgentOrchestrator(
         if (result.dataForLlm != null && llm.status.value is LlmStatus.Ready) {
             // Synthesis pass: render the observation in persona.
             val synthPrompt = buildString {
-                appendLine(PersonaPrompts.system(mode, tools.manifest()))
+                appendLine(PersonaPrompts.system(mode, tools.manifest(), LocalDateTime.now()))
                 appendLine()
                 appendLine(PersonaPrompts.toolSynthesis(action.tool, action.parameters, result.dataForLlm))
+                appendLine()
+                append("JARVIS:")
             }
             var synthBuffer = ""
             try {
@@ -252,16 +258,13 @@ class AgentOrchestrator(
         val lower = input.lowercase()
         val reply = when {
             Regex("""\b(hello|hi|hey|good (morning|afternoon|evening))\b""").containsMatchIn(lower) ->
-                "Good day, sir. My conversational core is dormant — no language model is loaded — " +
-                    "but the fast-action systems remain at your service: alarms, timers, torch, weather."
+                Repertoire.from(Repertoire.greetingsDormant)
             Regex("""\b(who are you|what are you|your name)\b""").containsMatchIn(lower) ->
-                "J.A.R.V.I.S., sir — your chief of staff. Currently running on reflexes alone; " +
-                    "load a language model in Settings to restore my higher faculties."
+                Repertoire.from(Repertoire.identityDormant)
             Regex("""\b(thank you|thanks)\b""").containsMatchIn(lower) ->
-                "Always a pleasure, sir."
+                Repertoire.from(Repertoire.thanks)
             else ->
-                "My language core is offline, sir. Install a model via Settings — meanwhile I retain " +
-                    "fast actions: alarms, timers, reminders, torch, volume, weather, and briefings."
+                Repertoire.from(Repertoire.coreOffline)
         }
         finishTurn(reply)
     }
