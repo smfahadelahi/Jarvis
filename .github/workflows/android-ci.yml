@@ -28,15 +28,40 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Assemble debug (full compile verification)
-        run: ./gradlew :app:assembleDebug --stacktrace
+        run: set -o pipefail && ./gradlew :app:assembleDebug --stacktrace 2>&1 | tee build.log
+
+      - name: Surface compile errors as annotations
+        if: failure()
+        run: |
+          {
+            echo "## Compile errors"
+            echo '```'
+            grep -E "^e: |error: " build.log | head -40 || echo "(no compiler lines found)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -E "^e: " build.log | head -50 | while IFS= read -r line; do
+            file=$(printf '%s' "$line" | sed -E 's|^e: file://[^ :]+(:[0-9]+:[0-9]+).*|\1|')
+            path=$(printf '%s' "$line" | sed -E 's|^e: file://([^ :]+):[0-9]+:[0-9]+.*|\1|')
+            msg=$(printf '%s' "$line" | sed -E 's|^e: file://[^ ]+ ||')
+            if [ "$path" != "$line" ] && [ -n "$path" ]; then
+              echo "::error file=${path#app/}${file%%:*}::${msg#*: }"
+            else
+              echo "::error::$line"
+            fi
+          done
 
       - name: Run unit tests
-        run: ./gradlew :app:testDebugUnitTest --stacktrace
+        run: set -o pipefail && ./gradlew :app:testDebugUnitTest --stacktrace 2>&1 | tee test.log
 
-      - name: Upload test reports on failure
+      - name: Surface test failures as annotations
         if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: app/build/reports/tests/
-          retention-days: 7
+        run: |
+          {
+            echo "## Test/compile errors"
+            echo '```'
+            grep -E "^e: |error: |FAILED" test.log | head -40 || echo "(no compiler lines found)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          grep -E "^e: " test.log | head -50 | while IFS= read -r line; do
+            echo "::error::$line"
+          done
